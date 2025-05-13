@@ -1,0 +1,49 @@
+services:
+  angular-create:
+    # user: "${UID:-1000}:${GID:-1000}"  # UID:GID of the host or created user
+    image: node:slim
+    working_dir: /app
+    profiles: ["create"]
+    volumes:
+      - .:/app
+    ports:
+      - "4200:4200"
+    environment:
+      - APP_NAME=my-angular-app
+      - ANGULAR_CREATE_OPTIONS=--routing --style=scss --ssr
+      - NODE_NO_WARNINGS=1
+    command: >
+      sh -c "
+        npm install -g @angular/cli &&
+        ng new ${APP_NAME} --skip-git --skip-install ${ANGULAR_CREATE_OPTIONS} &&
+        rm -rf ${APP_NAME}/.gitignore &&
+        mv ${APP_NAME}/README.md ${APP_NAME}/README-${APP_NAME}.md &&
+        mv ${APP_NAME}/* . &&
+        mv ${APP_NAME}/.* . 2>/dev/null || true &&
+        rm -rf ${APP_NAME} &&
+        npm i
+      "
+# cp docker/angular.json ${APP_NAME}/angular.json &&
+      
+  angular-prod:
+    build: 
+      context: .
+      target: build
+    container_name: angular_app_container
+    ports:
+      - "4200:80"
+    profiles: ["build"]
+  angular-dev:
+    build: 
+      context: .
+      target: dev
+    container_name: angular-app-dev
+    ports:
+      - "4200:4200"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - CHOKIDAR_USEPOLLING=true
+    command: sh -c "ng serve --host 0.0.0.0 --poll=1000"
+    profiles: ["dev"]

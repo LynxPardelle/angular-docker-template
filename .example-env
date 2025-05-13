@@ -1,0 +1,4 @@
+APP_NAME=my-angular-app
+ANGULAR_CREATE_OPTIONS=--routing --style=scss --ssr --standalone --strict 
+UID=1000
+GID=1000
