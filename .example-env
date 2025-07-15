@@ -1,4 +1,6 @@
 APP_NAME=my-angular-app
 ANGULAR_CREATE_OPTIONS=--routing --style=scss --ssr --standalone --strict 
+DEV_PORT=4200
+PROD_PORT=4000
 UID=1000
 GID=1000

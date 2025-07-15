@@ -1,13 +1,13 @@
 services:
   angular-create:
     # user: "${UID:-1000}:${GID:-1000}"  # UID:GID of the host or created user
-    image: node:slim
+    image: node:current-alpine3.22
     working_dir: /app
     profiles: ["create"]
     volumes:
       - .:/app
     ports:
-      - "4200:4200"
+      - "${DEV_PORT:-4200}:4200"
     environment:
       - APP_NAME=my-angular-app
       - ANGULAR_CREATE_OPTIONS=--routing --style=scss --ssr
@@ -21,25 +21,16 @@ services:
         mv ${APP_NAME}/* . &&
         mv ${APP_NAME}/.* . 2>/dev/null || true &&
         rm -rf ${APP_NAME} &&
-        npm i
+        npm i &&
+        npm pkg set scripts.serve:ssr=\"npm run serve:ssr:${APP_NAME}\"
       "
-# cp docker/angular.json ${APP_NAME}/angular.json &&
-      
-  angular-prod:
-    build: 
-      context: .
-      target: build
-    container_name: angular_app_container
-    ports:
-      - "4200:80"
-    profiles: ["build"]
   angular-dev:
     build: 
       context: .
       target: dev
     container_name: angular-app-dev
     ports:
-      - "4200:4200"
+      - "${DEV_PORT:-4200}:4200"
     volumes:
       - .:/app
       - /app/node_modules
@@ -47,3 +38,19 @@ services:
       - CHOKIDAR_USEPOLLING=true
     command: sh -c "ng serve --host 0.0.0.0 --poll=1000"
     profiles: ["dev"]
+  angular-prod:
+    build: 
+      context: .
+      target: build
+    container_name: angular_app_container
+    ports:
+      - "${PROD_PORT:-4000}:4000"
+    profiles: ["build"]
+  angular-prod-no-ssr:
+    build: 
+      context: .
+      target: production-no-ssr
+    container_name: angular_app_no_ssr_container
+    ports:
+      - "${PROD_PORT:-4000}:80"
+    profiles: ["build-no-ssr"]

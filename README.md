@@ -1,5 +1,5 @@
 
-# Angular Docker Template 🐳⚛️
+# Angular Docker Template 🐳🅰️
 
 This template allows you to **create, develop, and build** Angular apps, using Docker for everything. No need to install Node.js or npm on your host machine.
 
@@ -28,13 +28,21 @@ make dev
 
 Accessible at: [http://localhost:4200](http://localhost:4200)
 
-### 3. Start the production server (Nginx serving built files)
+### 3. Start the production server (with SSR)
 
 ```bash
 make prod
 ```
 
-Accessible at: [http://localhost:4200](http://localhost:4200)
+Accessible at: [http://localhost:4000](http://localhost:4000)
+
+### 4. Start the production server (without SSR - Nginx serving built files)
+
+```bash
+make prod-no-ssr
+```
+
+Accessible at: [http://localhost:4000](http://localhost:4000)
 
 ---
 
@@ -62,6 +70,8 @@ Example `.env`:
 `
 APP_NAME=my-angular-app
 ANGULAR_CREATE_OPTIONS=--routing --style=scss --ssr --standalone --strict
+DEV_PORT=4200
+PROD_PORT=4000
 UID=1000
 GID=1000
 `
@@ -80,7 +90,9 @@ GID=1000
 
 - Run `make create` only once, when initializing the app.
 - For new features, always use `make dev` so you never pollute your local environment.
-- Production containers are fully isolated and use Nginx for serving static files.
+- **Production options:**
+  - `make prod` - SSR-enabled production server (Node.js + Express)
+  - `make prod-no-ssr` - Static files served by Nginx (faster, no SSR)
 
 ---
 

@@ -20,6 +20,9 @@ dev:
 prod:
 	COMPOSE_BAKE=true $(COMPOSE) $(PROFILE_ARG) build up --build
 
+prod-no-ssr:
+	COMPOSE_BAKE=true $(COMPOSE) $(PROFILE_ARG) build-no-ssr up --build
+
 stop:
 	$(COMPOSE) down
 

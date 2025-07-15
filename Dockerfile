@@ -1,9 +1,12 @@
 # Base stage
-FROM node:slim AS base
+FROM node:current-alpine3.22 AS base
 WORKDIR /app
 
-# Install Angular CLI & Create a non-root user
-RUN npm install -g @angular/cli && useradd -ms /bin/bash appuser
+# Create a non-root user
+RUN adduser -D -s /bin/sh appuser
+
+# Install Angular CLI 
+RUN npm install -g @angular/cli
 
 # Copy package.json and package-lock.json
 # This is done separately to leverage Docker's caching mechanism
@@ -31,14 +34,24 @@ RUN chown -R appuser:appuser /app
 # Switch to non-root user
 USER appuser
 
-RUN ng build --output-path=dist
+RUN ng build
+CMD ["npm", "run", "serve:ssr"]
+EXPOSE 4000
 
-# Production stage
-# Use a lightweight web server to serve the static files
-# Use nginx to serve the static files
-# Use a specific version of nginx for better reproducibility
-FROM nginx:1.28.0-alpine-slim
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+# Production build stage (no SSR)
+FROM base AS build-no-ssr
+
+# Build the Angular app for production (no SSR)
+RUN ng build
+
+# Use nginx as the production server
+FROM nginx:alpine AS production-no-ssr
+
+# Copy the built app from build-no-ssr stage to nginx
+COPY --from=build-no-ssr /app/dist/*/browser /usr/share/nginx/html
+
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/nginx.conf
+
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
