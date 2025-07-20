@@ -17,7 +17,7 @@ x-common-variables: &common-variables
 services:
   create:
     # user: "${UID:-1000}:${GID:-1000}"  # UID:GID of the host or created user
-    image: node:current-alpine3.22
+    image: node:22-alpine
     working_dir: /app
     profiles: ["create"]
     volumes:
