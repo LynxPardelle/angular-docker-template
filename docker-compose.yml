@@ -44,7 +44,7 @@ services:
   dev:
     build: 
       context: .
-      target: dev
+      target: development
       args:
         <<: *common-variables
     container_name: ${APP_NAME:-my-angular-app}-dev
@@ -62,7 +62,7 @@ services:
       - CI=true
     # Override default command for development with additional options
     command: >
-      ng serve --host 0.0.0.0 --port 4200 --poll=1000 --disable-host-check --open=false
+      ng serve --host 0.0.0.0 --port 4200 --poll=1000
     # Health check for development container
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:4200/"]
@@ -113,7 +113,7 @@ services:
         - node:22-alpine
     container_name: ${APP_NAME:-my-angular-app}-prod-no-ssr
     ports:
-      - "${PROD_PORT:-4000}:80"
+      - "${PROD_NO_SSR_PORT:-4100}:80"
     environment:
       - NGINX_HOST=localhost
       - NGINX_PORT=80

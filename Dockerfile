@@ -1,5 +1,5 @@
 # =============================================================================
-# Multi-stage Dockerfile for Lynx Portfolio Angular Application
+# Multi-stage Dockerfile for Angular Application
 # =============================================================================
 # This Dockerfile creates optimized, secure, and efficient containers for:
 # 1. Development environment with hot-reload
@@ -126,7 +126,7 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
 
 # Use dumb-init to handle signals properly and start development server
 ENTRYPOINT ["dumb-init", "--"]
-CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "1000", "--disable-host-check"]
+CMD ["ng", "serve", "--host", "0.0.0.0", "--port", "4200", "--poll", "1000"]
 
 # -----------------------------------------------------------------------------
 # Build Stage - Production build with SSR
@@ -176,9 +176,7 @@ ENV CI=true
 COPY --chown=appuser:appgroup . .
 
 # Build the application for production without SSR with optimizations
-RUN ng build --configuration=production \
-    --prerender=false \
-    --ssr=false
+RUN ng build --configuration=production
 RUN npm cache clean --force
 
 # -----------------------------------------------------------------------------
@@ -209,7 +207,7 @@ RUN set -e; \
     fi
 
 # Copy built application from build stage
-COPY --from=build-no-ssr --chown=nginx-app:nginx-app /app/dist/lynx-portfolio/browser /usr/share/nginx/html
+COPY --from=build-no-ssr --chown=nginx-app:nginx-app /app/dist/*/browser /usr/share/nginx/html
 
 # Copy optimized nginx configuration
 COPY --chown=nginx-app:nginx-app nginx.conf /etc/nginx/nginx.conf
@@ -239,12 +237,12 @@ CMD ["-g", "daemon off;"]
 # Metadata Labels for Container Management
 # -----------------------------------------------------------------------------
 LABEL maintainer="LynxPardelle <lynxpardelle@lynxpardelle.com>"
-LABEL version="1.3.0"
-LABEL description="Lynx Portfolio Angular Application"
-LABEL org.opencontainers.image.title="Lynx Portfolio Angular"
-LABEL org.opencontainers.image.description="Angular portfolio application with SSR support"
-LABEL org.opencontainers.image.version="1.3.0"
+LABEL version="2.0.0"
+LABEL description="Angular Docker Template"
+LABEL org.opencontainers.image.title="Angular Docker Template"
+LABEL org.opencontainers.image.description="Angular application with SSR support"
+LABEL org.opencontainers.image.version="2.0.0"
 LABEL org.opencontainers.image.authors="LynxPardelle"
 LABEL org.opencontainers.image.url="https://lynxpardelle.com"
-LABEL org.opencontainers.image.source="https://github.com/LynxPardelle/lynx-portfolio-angular"
+LABEL org.opencontainers.image.source="https://github.com/LynxPardelle/angular-docker-template"
 LABEL org.opencontainers.image.licenses="MIT"
